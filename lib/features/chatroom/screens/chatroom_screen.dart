@@ -5,7 +5,8 @@ import 'package:tecky_chat/features/chatroom/widgets/chatroom_input.dart';
 import 'package:tecky_chat/features/chatroom/widgets/message_list.dart';
 
 class ChatroomScreen extends StatefulWidget {
-  const ChatroomScreen({Key? key}) : super(key: key);
+  final String title;
+  const ChatroomScreen({Key? key, required this.title}) : super(key: key);
 
   @override
   State<ChatroomScreen> createState() => _ChatroomScreenState();
@@ -29,7 +30,7 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const ChatroomAppBar(title: 'Athalia Putri'),
+      appBar: ChatroomAppBar(title: widget.title),
       body: Column(children: [
         Expanded(child: MessageList(messages: _messages)),
         ChatroomInput(

@@ -38,9 +38,12 @@ class ChatroomAppBar extends StatelessWidget implements PreferredSizeWidget {
         const SizedBox(width: 16)
       ],
       title: Row(children: [
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Icon(Icons.chevron_left, color: ThemeColors.neutralActive),
+        GestureDetector(
+          onTap: Navigator.of(context).pop,
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(Icons.chevron_left, color: ThemeColors.neutralActive),
+          ),
         ),
         Text(
           title,
