@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tecky_chat/features/auth/blocs/auth_bloc.dart';
+import 'package:tecky_chat/features/auth/blocs/auth_state.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
 class Setting {
@@ -35,6 +38,9 @@ class SettingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // No subscription
+    // final authBloc = context.read<AuthBloc>();
+
     return Container(
       color: ThemeColors.neutralWhite,
       child: ListView(
@@ -42,8 +48,10 @@ class SettingScreen extends StatelessWidget {
           // Image.xxx vs XXXImage
           // Former is widget
           // Latter is Class to provide Image
-          const ListTile(
-            title: Text('Almayra Zamzamy'),
+          ListTile(
+            title: BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+              return Text(state.user?.displayName ?? '');
+            }),
             subtitle: Text('+85253732650'),
             trailing: Icon(Icons.chevron_right),
             leading: CircleAvatar(

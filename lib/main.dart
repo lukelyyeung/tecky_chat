@@ -1,27 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tecky_chat/features/auth/blocs/auth_bloc.dart';
+import 'package:tecky_chat/features/auth/blocs/auth_state.dart';
 import 'package:tecky_chat/features/chatroom/screens/chatroom_screen.dart';
 import 'package:tecky_chat/features/common/screens/main_tab_screen.dart';
 import 'package:tecky_chat/features/common/screens/splash_screen.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
-void main() {
-  runApp(MyApp());
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+/// Custom [BlocObserver] that observes all bloc and cubit state changes.
+class AppBlocObserver extends BlocObserver {
+  @override
+  void onChange(BlocBase bloc, Change change) {
+    super.onChange(bloc, change);
+    if (bloc is Bloc) print(change);
+  }
+
+  @override
+  void onTransition(Bloc bloc, Transition transition) {
+    super.onTransition(bloc, transition);
+    print(transition);
+  }
 }
 
-class MyApp extends StatelessWidget {
-  final authBloc = AuthBloc();
-  MyApp({Key? key}) : super(key: key);
+void main() {
+  BlocOverrides.runZoned(
+    () => runApp(const AppWithProviders()),
+    blocObserver: AppBlocObserver(),
+  );
+}
 
+class AppWithProviders extends StatelessWidget {
+  const AppWithProviders({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(providers: [BlocProvider(create: (_) => AuthBloc())], child: MyApp());
+  }
+}
+
+class MyApp extends StatefulWidget {
+  // final authBloc = AuthBloc();
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   GoRouter get _router {
+    final authBloc = context.read<AuthBloc>();
+
     return GoRouter(
       redirect: (state) {
-        if (authBloc.isLoggedIn == null) {
+        if (authBloc.state.status == AuthStatus.unknown) {
           return state.subloc == '/splash' ? null : '/splash?from=${state.subloc}';
         }
 
-        if (authBloc.isLoggedIn == true) {
+        if (authBloc.state.isAuthenticated) {
           return ['/splash', '/login', '/register'].contains(state.subloc)
               ? (state.queryParams['from'] ?? '/')
               : null;
@@ -37,7 +76,7 @@ class MyApp extends StatelessWidget {
 
         // if loginState == false, redirect to '/login'
       },
-      refreshListenable: GoRouterRefreshStream(authBloc.isLoggedInStream),
+      refreshListenable: GoRouterRefreshStream(authBloc.stream),
       initialLocation: '/splash',
       routes: [
         GoRoute(path: '/', redirect: (_) => '/main?tab=contacts'),
@@ -98,7 +137,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    authBloc.retrieveLoginState();
     return MaterialApp.router(
       routeInformationParser: _router.routeInformationParser,
       routerDelegate: _router.routerDelegate,

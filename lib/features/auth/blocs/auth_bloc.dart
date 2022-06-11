@@ -1,20 +1,20 @@
-import 'dart:async';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tecky_chat/features/auth/blocs/auth_event.dart';
+import 'package:tecky_chat/features/auth/blocs/auth_state.dart';
+import 'package:tecky_chat/features/common/models/user.dart';
 
-class AuthBloc {
-  final loginState = StreamController<bool?>.broadcast();
-  bool? isLoggedIn;
+class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  AuthBloc() : super(AuthState.initial()) {
+    on<AuthRetrieveStatus>(_onAuthRetrieveState);
+    on<AuthLogOutRequest>(_onLogOutRequest);
+    on<AuthLogInRequest>(_onLogInRequest);
+  }
 
-  AuthBloc();
-
-  void retrieveLoginState() async {
+  void _onAuthRetrieveState(AuthRetrieveStatus event, Emitter emit) async {
     await Future.delayed(const Duration(seconds: 3));
-    isLoggedIn = true;
-    loginState.sink.add(true);
+    emit(AuthState.authenticated(User(displayName: 'Luke Yeung')));
   }
 
-  dispose() {
-    loginState.close();
-  }
-
-  Stream<bool?> get isLoggedInStream => loginState.stream;
+  void _onLogOutRequest(AuthLogOutRequest event, Emitter emit) {}
+  void _onLogInRequest(AuthLogInRequest event, Emitter emit) {}
 }
