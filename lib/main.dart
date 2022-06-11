@@ -1,26 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tecky_chat/features/auth/blocs/auth_bloc.dart';
 import 'package:tecky_chat/features/chatroom/screens/chatroom_screen.dart';
 import 'package:tecky_chat/features/common/screens/main_tab_screen.dart';
+import 'package:tecky_chat/features/common/screens/splash_screen.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final authBloc = AuthBloc();
+  MyApp({Key? key}) : super(key: key);
 
   GoRouter get _router {
     return GoRouter(
-      initialLocation: '/',
+      redirect: (state) {
+        if (authBloc.isLoggedIn == null) {
+          return state.subloc == '/splash' ? null : '/splash?from=${state.subloc}';
+        }
+
+        if (authBloc.isLoggedIn == true) {
+          return ['/splash', '/login', '/register'].contains(state.subloc)
+              ? (state.queryParams['from'] ?? '/')
+              : null;
+        }
+
+        return state.subloc != '/login' ? '/login' : null;
+
+        // if no need to redirect, return null;
+
+        // if loginState == null, redirect to '/splash?from=${state.subloc}'
+
+        // if loginState == true, redirect to state.queryParameters['from] ?? '/';
+
+        // if loginState == false, redirect to '/login'
+      },
+      refreshListenable: GoRouterRefreshStream(authBloc.isLoggedInStream),
+      initialLocation: '/splash',
       routes: [
         GoRoute(path: '/', redirect: (_) => '/main?tab=contacts'),
+        GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
         GoRoute(
             path: '/main',
-            builder: (context, state) {
+            pageBuilder: (context, state) {
               final tabName = state.queryParams['tab'] ?? 'contacts';
-              return MainTabScreen(currentTab: tabName);
+              return CustomTransitionPage(
+                  transitionDuration: const Duration(milliseconds: 450),
+                  key: state.pageKey,
+                  child: MainTabScreen(currentTab: tabName),
+                  transitionsBuilder: (context, primaryAnimation, _, child) {
+                    final opacity = Tween(begin: 0.2, end: 1.0).animate(
+                        CurvedAnimation(parent: primaryAnimation, curve: Curves.easeInOutQuad));
+
+                    final offset = Tween(begin: const Offset(0, 1), end: Offset.zero).animate(
+                        CurvedAnimation(parent: primaryAnimation, curve: Curves.easeInOutQuad));
+
+                    return SlideTransition(
+                        position: offset, child: FadeTransition(opacity: opacity, child: child));
+                  });
             }),
         GoRoute(
             path: '/chats/:id',
@@ -59,6 +98,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    authBloc.retrieveLoginState();
     return MaterialApp.router(
       routeInformationParser: _router.routeInformationParser,
       routerDelegate: _router.routerDelegate,
