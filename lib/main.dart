@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tecky_chat/features/chatroom/screens/chatroom_screen.dart';
 import 'package:tecky_chat/features/common/screens/main_tab_screen.dart';
+import 'package:tecky_chat/theme/colors.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,6 +27,31 @@ class MyApp extends StatelessWidget {
             builder: (context, state) {
               final username = state.params['id'] as String;
               return ChatroomScreen(title: username);
+            }),
+        GoRoute(
+            path: '/settings/:id',
+            builder: (context, state) {
+              final title = state.extra as String;
+              return Scaffold(
+                body: Center(child: Text(title)),
+                appBar: AppBar(
+                  elevation: 0,
+                  backgroundColor: ThemeColors.neutralWhite,
+                  title: Text(title, style: const TextStyle(color: ThemeColors.neutralActive)),
+                  centerTitle: false,
+                  // Delay the creation of widget to layout
+                  // Provide the latest context
+                  leading: Builder(
+                    builder: (context) => GestureDetector(
+                      onTap: Navigator.of(context).pop,
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(Icons.chevron_left, color: ThemeColors.neutralActive),
+                      ),
+                    ),
+                  ),
+                ),
+              );
             })
       ],
     );
