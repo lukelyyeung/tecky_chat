@@ -42,7 +42,7 @@ class AuthRepository {
     }
   }
 
-  Future<void> logout({required String email, required String password}) async {
+  Future<void> logout() async {
     await firebaseAuth.signOut();
   }
 }

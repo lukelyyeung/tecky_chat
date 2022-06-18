@@ -2,32 +2,33 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tecky_chat/features/auth/blocs/login_form_cubit.dart';
 import 'package:tecky_chat/features/auth/blocs/register_form_cubit.dart';
 import 'package:tecky_chat/features/auth/repositories/auth_repository.dart';
 import 'package:tecky_chat/features/common/constants/form_status.dart';
 import 'package:tecky_chat/theme/colors.dart';
 import 'package:tecky_chat/theme/theme.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        child: const _RegisterScreen(),
-        create: (_) => RegisterFormCubit(
+        child: const _LoginScreen(),
+        create: (_) => LoginFormCubit(
             authRepository: RepositoryProvider.of<AuthRepository>(context, listen: false)));
   }
 }
 
-class _RegisterScreen extends StatefulWidget {
-  const _RegisterScreen({Key? key}) : super(key: key);
+class _LoginScreen extends StatefulWidget {
+  const _LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<_RegisterScreen> createState() => _RegisterScreenState();
+  State<_LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<_RegisterScreen> {
+class _LoginScreenState extends State<_LoginScreen> {
   String? _email;
   String? _password;
   String? _confirmPassword;
@@ -49,7 +50,7 @@ class _RegisterScreenState extends State<_RegisterScreen> {
                   filterQuality: FilterQuality.high,
                 ),
                 const Text(
-                  'Create an account and start journey',
+                  'Login and continue coding',
                   style: TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 48),
@@ -82,23 +83,7 @@ class _RegisterScreenState extends State<_RegisterScreen> {
                     obscureText: true,
                     decoration:
                         TeckyChatTheme.textFieldInputDecoration.copyWith(hintText: 'Password')),
-                const SizedBox(height: 16),
-                TextFormField(
-                    onChanged: (input) => _confirmPassword = input,
-                    validator: (input) {
-                      if (input?.isNotEmpty != true) {
-                        return 'Confirm password is required.';
-                      }
-
-                      if (_password != _confirmPassword) {
-                        return 'Password does not match.';
-                      }
-                    },
-                    cursorColor: ThemeColors.neutralActive,
-                    obscureText: true,
-                    decoration: TeckyChatTheme.textFieldInputDecoration
-                        .copyWith(hintText: 'Confirm Password')),
-                BlocBuilder<RegisterFormCubit, RegisterFormState>(builder: (context, state) {
+                BlocBuilder<LoginFormCubit, LoginFormState>(builder: (context, state) {
                   if (state.error == null) {
                     return const SizedBox(height: 0);
                   }
@@ -118,9 +103,9 @@ class _RegisterScreenState extends State<_RegisterScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
-                    onTap: () => context.go('/login'),
+                    onTap: () => context.go('/register'),
                     child: const Text(
-                      'Have an account? Login!',
+                      'Don\'t have an account? Register!',
                       style: TextStyle(color: ThemeColors.brandDefault),
                     ),
                   ),
@@ -132,14 +117,13 @@ class _RegisterScreenState extends State<_RegisterScreen> {
 
                     if (formState.validate()) {
                       formState.save();
-                      context.read<RegisterFormCubit>().submitRegisterForm(
+                      context.read<LoginFormCubit>().submitLoginForm(
                             email: _email!,
                             password: _password!,
                           );
                     }
                   },
-                  child:
-                      BlocBuilder<RegisterFormCubit, RegisterFormState>(builder: (context, state) {
+                  child: BlocBuilder<LoginFormCubit, LoginFormState>(builder: (context, state) {
                     final isLoading = state.formStatus == FormStatus.submitting;
 
                     return Container(

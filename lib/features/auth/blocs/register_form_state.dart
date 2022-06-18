@@ -1,12 +1,5 @@
 part of 'register_form_cubit.dart';
 
-enum FormStatus {
-  normal,
-  error,
-  submitting,
-  submitted,
-}
-
 class RegisterFormState {
   final FormStatus formStatus;
   final String? error;

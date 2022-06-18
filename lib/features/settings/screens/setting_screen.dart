@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tecky_chat/features/auth/blocs/auth_bloc.dart';
 import 'package:tecky_chat/features/auth/blocs/auth_state.dart';
+import 'package:tecky_chat/features/auth/repositories/auth_repository.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
 class Setting {
@@ -69,7 +70,17 @@ class SettingScreen extends StatelessWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
             );
-          })
+          }),
+
+          ListTile(
+              onTap: () => context.read<AuthRepository>().logout(),
+              title: Row(
+                children: const [
+                  Icon(Icons.logout),
+                  SizedBox(width: 6),
+                  Text('Logout'),
+                ],
+              )),
         ],
       ),
     );

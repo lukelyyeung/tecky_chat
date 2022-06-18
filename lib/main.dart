@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tecky_chat/features/auth/blocs/auth_bloc.dart';
 import 'package:tecky_chat/features/auth/blocs/auth_state.dart';
 import 'package:tecky_chat/features/auth/repositories/auth_repository.dart';
+import 'package:tecky_chat/features/auth/screens/login_screen.dart';
 import 'package:tecky_chat/features/auth/screens/register_screen.dart';
 import 'package:tecky_chat/features/chatroom/screens/chatroom_screen.dart';
 import 'package:tecky_chat/features/common/screens/main_tab_screen.dart';
@@ -81,7 +82,11 @@ class _MyAppState extends State<MyApp> {
               : null;
         }
 
-        return state.subloc != '/login' ? '/login' : null;
+        if (['/login', '/register'].contains(state.subloc)) {
+          return null;
+        }
+
+        return '/login';
 
         // if no need to redirect, return null;
 
@@ -95,7 +100,8 @@ class _MyAppState extends State<MyApp> {
       initialLocation: '/splash',
       routes: [
         GoRoute(path: '/', redirect: (_) => '/main?tab=contacts'),
-        GoRoute(path: '/login', builder: (context, state) => const RegisterScreen()),
+        GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+        GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
         GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
         GoRoute(
             path: '/main',

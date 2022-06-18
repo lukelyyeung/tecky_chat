@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tecky_chat/features/auth/repositories/auth_repository.dart';
+import 'package:tecky_chat/features/common/constants/form_status.dart';
 
 part 'register_form_state.dart';
 
