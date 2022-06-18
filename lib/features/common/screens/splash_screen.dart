@@ -1,9 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tecky_chat/features/auth/blocs/auth_bloc.dart';
-import 'package:tecky_chat/features/auth/blocs/auth_event.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({this.from, Key? key}) : super(key: key);
@@ -28,8 +25,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
 
     _controller.repeat(reverse: true);
-
-    context.read<AuthBloc>().add(AuthRetrieveStatus());
   }
 
   @override

@@ -1,16 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tecky_chat/features/auth/blocs/auth_bloc.dart';
 import 'package:tecky_chat/features/auth/blocs/auth_state.dart';
+import 'package:tecky_chat/features/auth/repositories/auth_repository.dart';
+import 'package:tecky_chat/features/auth/screens/register_screen.dart';
 import 'package:tecky_chat/features/chatroom/screens/chatroom_screen.dart';
 import 'package:tecky_chat/features/common/screens/main_tab_screen.dart';
 import 'package:tecky_chat/features/common/screens/splash_screen.dart';
 import 'package:tecky_chat/features/contacts/blocs/contact_bloc.dart';
+import 'package:tecky_chat/firebase_options.dart';
 import 'package:tecky_chat/theme/colors.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Custom [BlocObserver] that observes all bloc and cubit state changes.
 class AppBlocObserver extends BlocObserver {
@@ -27,7 +29,11 @@ class AppBlocObserver extends BlocObserver {
   }
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   BlocOverrides.runZoned(
     () => runApp(const AppWithProviders()),
     blocObserver: AppBlocObserver(),
@@ -39,10 +45,15 @@ class AppWithProviders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(providers: [
-      BlocProvider(create: (_) => AuthBloc()),
-      BlocProvider(create: (_) => ContactBloc())
-    ], child: MyApp());
+    final firebaseAuth = FirebaseAuth.instance;
+    // firebaseAuth.signOut();
+
+    return MultiRepositoryProvider(
+        providers: [RepositoryProvider(create: (_) => AuthRepository(firebaseAuth: firebaseAuth))],
+        child: MultiBlocProvider(providers: [
+          BlocProvider(create: (ctx) => AuthBloc(authRepository: ctx.read<AuthRepository>())),
+          BlocProvider(create: (_) => ContactBloc())
+        ], child: MyApp()));
   }
 }
 
@@ -84,6 +95,7 @@ class _MyAppState extends State<MyApp> {
       initialLocation: '/splash',
       routes: [
         GoRoute(path: '/', redirect: (_) => '/main?tab=contacts'),
+        GoRoute(path: '/login', builder: (context, state) => const RegisterScreen()),
         GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
         GoRoute(
             path: '/main',
