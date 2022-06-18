@@ -5,3 +5,9 @@ abstract class ContactEvent {
 }
 
 class ContactRetrieve extends ContactEvent {}
+
+class ContactListChange extends ContactEvent {
+  final List<Contact> contacts;
+
+  ContactListChange(this.contacts);
+}

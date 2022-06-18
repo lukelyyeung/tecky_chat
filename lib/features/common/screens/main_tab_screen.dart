@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tecky_chat/features/chatroom/screens/chatroom_list_screen.dart';
 import 'package:tecky_chat/features/common/widgets/custom_bottom_navigation_bar.dart';
 import 'package:tecky_chat/features/contacts/screens/contact_screen.dart';
 import 'package:tecky_chat/features/settings/screens/setting_screen.dart';
@@ -49,7 +50,7 @@ class _MainTabScreenState extends State<MainTabScreen> with SingleTickerProvider
     return Scaffold(
       body: TabBarView(controller: _tabController, children: const [
         ContactScreen(),
-        Scaffold(body: Center(child: Text('Chats'))),
+        ChatroomListScreen(),
         SettingScreen(),
       ]),
       bottomNavigationBar: AnimatedBuilder(
@@ -67,12 +68,11 @@ class _MainTabScreenState extends State<MainTabScreen> with SingleTickerProvider
           backgroundColor: ThemeColors.neutralWhite,
           centerTitle: false,
           title: AnimatedBuilder(
-            animation: _tabController,
-            builder: (context, _) {
-              final title = MainTabScreen.tabs[_tabController.index].toUpperCase();
-              return Text(title, style: const TextStyle(color: ThemeColors.neutralActive));
-            }
-          )),
+              animation: _tabController,
+              builder: (context, _) {
+                final title = MainTabScreen.tabs[_tabController.index].toUpperCase();
+                return Text(title, style: const TextStyle(color: ThemeColors.neutralActive));
+              })),
     );
   }
 }
