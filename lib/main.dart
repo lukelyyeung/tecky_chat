@@ -6,6 +6,7 @@ import 'package:tecky_chat/features/auth/blocs/auth_state.dart';
 import 'package:tecky_chat/features/chatroom/screens/chatroom_screen.dart';
 import 'package:tecky_chat/features/common/screens/main_tab_screen.dart';
 import 'package:tecky_chat/features/common/screens/splash_screen.dart';
+import 'package:tecky_chat/features/contacts/blocs/contact_bloc.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
 import 'package:flutter/material.dart';
@@ -38,7 +39,10 @@ class AppWithProviders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(providers: [BlocProvider(create: (_) => AuthBloc())], child: MyApp());
+    return MultiBlocProvider(providers: [
+      BlocProvider(create: (_) => AuthBloc()),
+      BlocProvider(create: (_) => ContactBloc())
+    ], child: MyApp());
   }
 }
 
