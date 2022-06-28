@@ -26,6 +26,17 @@ class Chatroom {
 
   static const empty = Chatroom(id: '', displayName: '');
 
+  static Map<String, dynamic> createChatroomPayload({required String userId, required String opponentId}) {
+    return {
+      "participant.$opponentId": true,
+      "participant.$userId": true,
+      "participants": [opponentId, userId],
+      "createdAt": FieldValue.serverTimestamp(),
+      "modifiedAt": FieldValue.serverTimestamp(),
+      "latestMessageAt": FieldValue.serverTimestamp(),
+    };
+  }
+
   Chatroom.fromJSON(Map<String, dynamic> json)
       : id = json['id'] ?? '',
         displayName = json['displayName'] ?? '',

@@ -22,7 +22,7 @@ class ChatroomRepository {
     return firebaseFirestore
         .collection(_ChatroomCollectionPaths.chatrooms)
         .where('participants', arrayContainsAny: [firebaseAuth.currentUser?.uid])
-        .orderBy('lastMessageAt', descending: true)
+        .orderBy('latestMessageAt', descending: true)
         .snapshots()
         .asyncMap((snapshot) async {
           if (snapshot.size == 0) {
@@ -53,22 +53,49 @@ class ChatroomRepository {
         });
   }
 
-  Future<void> createChatroom(String opponentId) async {
+  Stream<Chatroom> getChatroomStream(String chatroomId) {
+    return firebaseFirestore
+        .collection(_ChatroomCollectionPaths.chatrooms)
+        .doc(chatroomId)
+        .snapshots()
+        .asyncMap((doc) async {
+      var chatroom = Chatroom.fromJSON(doc.toJSON());
+
+      if (!chatroom.isGroup) {
+        final users = await userRepository.getUsersByIds(chatroom.participants);
+
+        final userMap = {for (var user in users) user.id: user};
+
+        final opponentId =
+            chatroom.participants.firstWhere((userId) => userId != firebaseAuth.currentUser?.uid);
+
+        final opponent = userMap[opponentId]!;
+        chatroom =
+            chatroom.copyWith(displayName: opponent.displayName, iconUrl: opponent.profileUrl);
+      }
+
+      return chatroom;
+    });
+  }
+
+  Future<String> createChatroom(String opponentId) async {
     final existingRoom = await firebaseFirestore
         .collection(_ChatroomCollectionPaths.chatrooms)
         .where('isGroup', isEqualTo: false)
-        .where('participants', arrayContains: [opponentId, firebaseAuth.currentUser?.uid])
+        .where('participant.$opponentId', isEqualTo: true)
+        .where('participant.${firebaseAuth.currentUser?.uid}', isEqualTo: true)
         .limit(1)
         .get();
 
     if (existingRoom.size > 0) {
-      return;
+      return existingRoom.docs.first.id;
     }
 
-    await firebaseFirestore.collection(_ChatroomCollectionPaths.chatrooms).add({
-      "participants": [opponentId, firebaseAuth.currentUser?.uid],
-      "createdAt": FieldValue.serverTimestamp(),
-    });
+    final doc = await firebaseFirestore.collection(_ChatroomCollectionPaths.chatrooms).add(
+        Chatroom.createChatroomPayload(
+            userId: firebaseAuth.currentUser!.uid, opponentId: opponentId));
+
+    return doc.id;
   }
 
   Future<void> createGroup() async {}

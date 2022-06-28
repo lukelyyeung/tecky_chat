@@ -52,7 +52,6 @@ class AppWithProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     final firebaseAuth = FirebaseAuth.instance;
     final firebaseFirestore = FirebaseFirestore.instance;
-    // firebaseAuth.signOut();
 
     return MultiRepositoryProvider(
         providers: [
@@ -60,8 +59,10 @@ class AppWithProviders extends StatelessWidget {
               create: (_) =>
                   UserRepository(firebaseAuth: firebaseAuth, firebaseFirestore: firebaseFirestore)),
           RepositoryProvider(
-              create: (_) => ChatroomRepository(
-                  firebaseAuth: firebaseAuth, firebaseFirestore: firebaseFirestore)),
+              create: (ctx) => ChatroomRepository(
+                  userRepository: ctx.read<UserRepository>(),
+                  firebaseAuth: firebaseAuth,
+                  firebaseFirestore: firebaseFirestore)),
           RepositoryProvider(create: (_) => AuthRepository(firebaseAuth: firebaseAuth)),
         ],
         child: MultiBlocProvider(providers: [
@@ -71,9 +72,13 @@ class AppWithProviders extends StatelessWidget {
                   authRepository: ctx.read<AuthRepository>(),
                   userRepository: ctx.read<UserRepository>())),
           BlocProvider(
-              create: (ctx) => ChatroomListBloc(chatroomRepository: ctx.read<ChatroomRepository>())),
-          BlocProvider(create: (ctx) => ContactListBloc(userRepository: ctx.read<UserRepository>()))
-        ], child: MyApp()));
+              create: (ctx) =>
+                  ChatroomListBloc(chatroomRepository: ctx.read<ChatroomRepository>())),
+          BlocProvider(
+              create: (ctx) => ContactListBloc(
+                  chatroomRepository: ctx.read<ChatroomRepository>(),
+                  userRepository: ctx.read<UserRepository>()))
+        ], child: const MyApp()));
   }
 }
 
@@ -148,8 +153,8 @@ class _MyAppState extends State<MyApp> {
         GoRoute(
             path: '/chats/:id',
             builder: (context, state) {
-              final username = state.params['id'] as String;
-              return ChatroomScreen(title: username);
+              final chatroomId = state.params['id'] as String;
+              return ChatroomScreen(chatroomId: chatroomId);
             }),
         GoRoute(
             path: '/settings/:id',

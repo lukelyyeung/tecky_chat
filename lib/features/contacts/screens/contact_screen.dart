@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,13 +16,6 @@ class ContactScreen extends StatefulWidget {
 }
 
 class _ContactScreenState extends State<ContactScreen> {
-  
-  @override
-  void initState() {
-    super.initState();
-    context.read<ContactListBloc>().add(ContactRetrieve());
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +32,14 @@ class _ContactScreenState extends State<ContactScreen> {
               children: [
                 for (var contact in state.contacts)
                   UserItem(
-                      onTap: () => context.push('/chats/${contact.username}'),
+                      onTap: () {
+                        final completer = Completer<String>()
+                          ..future.then((chatroomId) => context.push('/chats/$chatroomId'));
+
+                        context
+                            .read<ContactListBloc>()
+                            .add(ContactListStartChat(contact, completer: completer));
+                      },
                       onlineStatus: UserOnlineStatus.online,
                       withDivider: true,
                       displayName: contact.username,

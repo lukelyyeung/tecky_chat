@@ -12,6 +12,7 @@ class ChatroomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false,
       backgroundColor: ThemeColors.neutralWhite,
       elevation: 0,
       centerTitle: false,

@@ -11,3 +11,10 @@ class ContactListChange extends ContactListEvent {
 
   ContactListChange(this.contacts);
 }
+
+class ContactListStartChat extends ContactListEvent {
+  final Contact contact;
+  final Completer<String>? completer;
+
+  ContactListStartChat(this.contact, {this.completer});
+}
