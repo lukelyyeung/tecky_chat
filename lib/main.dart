@@ -86,10 +86,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  GoRouter get _router {
-    final authBloc = context.read<AuthBloc>();
+  late final GoRouter _router;
 
-    return GoRouter(
+  @override
+  void initState() {
+    super.initState();
+
+    final authBloc = context.read<AuthBloc>();
+    _router = GoRouter(
       redirect: (state) {
         if (authBloc.state.status == AuthStatus.unknown) {
           return state.subloc == '/splash' ? null : '/splash?from=${state.subloc}';
