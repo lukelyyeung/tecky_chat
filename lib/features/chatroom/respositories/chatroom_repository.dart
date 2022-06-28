@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:tecky_chat/extensions/extended_document_snasphot.dart';
 import 'package:tecky_chat/features/chatroom/models/chatroom.dart';
 import 'package:tecky_chat/features/chatroom/models/message.dart';
-import 'package:tecky_chat/features/common/models/user.dart';
+import 'package:tecky_chat/features/common/repositories/user_respository.dart';
 
 class _ChatroomCollectionPaths {
   static const chatrooms = 'chatrooms';
@@ -12,57 +13,42 @@ class _ChatroomCollectionPaths {
 class ChatroomRepository {
   final FirebaseAuth firebaseAuth;
   final FirebaseFirestore firebaseFirestore;
+  final UserRepository userRepository;
 
-  ChatroomRepository({required this.firebaseFirestore, required this.firebaseAuth});
+  ChatroomRepository(
+      {required this.firebaseFirestore, required this.firebaseAuth, required this.userRepository});
 
   Stream<List<Chatroom>> get chatrooms {
     return firebaseFirestore
         .collection(_ChatroomCollectionPaths.chatrooms)
         .where('participants', arrayContainsAny: [firebaseAuth.currentUser?.uid])
-        // .orderBy('createdAt', descending: true)
+        .orderBy('lastMessageAt', descending: true)
         .snapshots()
         .asyncMap((snapshot) async {
           if (snapshot.size == 0) {
             return [];
           }
 
-          final userIds =
-              snapshot.docs.map((doc) => doc.data()['participants']).toList();
-          final flattenedUserIds = [for (var batch in userIds) ...batch];
+          final userIds = snapshot.docs.map((doc) => doc.data()['participants']).toList();
+          final flattenedUserIds = [for (var batch in userIds) ...batch].cast<String>();
 
-          // @TODO: Should do this in UserRepository
-          final users = await firebaseFirestore
-              .collection('users')
-              .where('id', whereIn: flattenedUserIds)
-              .get()
-              .then((snapshot) => snapshot.docs.map((doc) => User.fromJSON(doc.data())));
+          final users = await userRepository.getUsersByIds(flattenedUserIds);
 
           final userMap = {for (var user in users) user.id: user};
 
           return snapshot.docs.map((doc) {
-            final data = doc.data();
-            final isGroup = data['isGroup'] ?? false;
+            var chatroom = Chatroom.fromJSON(doc.toJSON());
 
-            var displayName = '';
-            String? iconUrl;
+            if (!chatroom.isGroup) {
+              final opponentId = chatroom.participants
+                  .firstWhere((userId) => userId != firebaseAuth.currentUser?.uid);
 
-            if (isGroup) {
-              displayName = data['displayName'];
-              iconUrl = data['iconUrl'];
-            } else {
-              final opponent = userMap[(data['participants'])
-                  .firstWhere((userId) => userId != firebaseAuth.currentUser?.uid)]!;
-              displayName = opponent.displayName;
-              iconUrl = opponent.profileUrl;
+              final opponent = userMap[opponentId]!;
+              chatroom = chatroom.copyWith(
+                  displayName: opponent.displayName, iconUrl: opponent.profileUrl);
             }
 
-            return Chatroom(
-              id: doc.id,
-              displayName: displayName,
-              iconUrl: iconUrl,
-              participants: List.castFrom<dynamic, String>(['participants']),
-              isGroup: data['isGroup'] ?? false,
-            );
+            return chatroom;
           }).toList();
         });
   }

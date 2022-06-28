@@ -21,6 +21,15 @@ class UserRepository {
         .map((snapshot) => snapshot.docs.map((doc) => User.fromJSON(doc.data())).toList());
   }
 
+  Future<List<User>> getUsersByIds(List<String> userIds) async {
+    final snapshot = await firebaseFirestore
+        .collection(_UserCollectionPaths.users)
+        .where('id', whereIn: userIds)
+        .get();
+
+    return snapshot.docs.map((doc) => User.fromJSON(doc.data())).toList();
+  }
+
   Future<void> createUser(User currentUser) async {
     await firebaseFirestore
         .collection(_UserCollectionPaths.users)
