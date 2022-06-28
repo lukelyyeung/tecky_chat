@@ -5,15 +5,14 @@ import 'package:tecky_chat/features/common/models/user.dart';
 import 'package:tecky_chat/features/common/repositories/user_respository.dart';
 import 'package:tecky_chat/features/contacts/models/contact.dart';
 
-part 'contact_event.dart';
-part 'contact_state.dart';
+part 'contact_list_event.dart';
+part 'contact_list_state.dart';
 
-class ContactBloc extends Bloc<ContactEvent, ContactState> {
+class ContactListBloc extends Bloc<ContactListEvent, ContactListState> {
   final UserRepository userRepository;
   late final StreamSubscription<List<User>> _contactListSubscription;
 
-  ContactBloc({required this.userRepository}) : super(ContactState.initial()) {
-    on<ContactRetrieve>(_onContactRetrieve);
+  ContactListBloc({required this.userRepository}) : super(ContactListState.initial()) {
     on<ContactListChange>(_onContactListChange);
 
     _listenToContactList();
@@ -33,17 +32,6 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
   }
 
   void _onContactListChange(ContactListChange event, Emitter emit) {
-    emit(ContactState.loaded(event.contacts));
-  }
-
-  Future<void> _onContactRetrieve(ContactRetrieve event, Emitter emit) async {
-    // emit(ContactState.loading());
-    // await Future.delayed(const Duration(seconds: 2));
-    // emit(ContactState.loaded([
-    //   Contact(username: 'Luke Yeung', id: 'luke'),
-    //   Contact(username: 'Alex Lau', id: 'alex'),
-    //   Contact(username: 'Gordan Lau', id: 'gordan'),
-    //   Contact(username: 'Michael Fung', id: 'michael'),
-    // ]));
+    emit(ContactListState.loaded(event.contacts));
   }
 }

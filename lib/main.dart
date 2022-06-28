@@ -9,13 +9,13 @@ import 'package:tecky_chat/features/auth/blocs/auth_state.dart';
 import 'package:tecky_chat/features/auth/repositories/auth_repository.dart';
 import 'package:tecky_chat/features/auth/screens/login_screen.dart';
 import 'package:tecky_chat/features/auth/screens/register_screen.dart';
-import 'package:tecky_chat/features/chatroom/blocs/chatroom_bloc.dart';
+import 'package:tecky_chat/features/chatroom/blocs/chatroom_list_bloc.dart';
 import 'package:tecky_chat/features/chatroom/respositories/chatroom_repository.dart';
 import 'package:tecky_chat/features/chatroom/screens/chatroom_screen.dart';
 import 'package:tecky_chat/features/common/repositories/user_respository.dart';
 import 'package:tecky_chat/features/common/screens/main_tab_screen.dart';
 import 'package:tecky_chat/features/common/screens/splash_screen.dart';
-import 'package:tecky_chat/features/contacts/blocs/contact_bloc.dart';
+import 'package:tecky_chat/features/contacts/blocs/contact_list_bloc.dart';
 import 'package:tecky_chat/firebase_options.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
@@ -71,8 +71,8 @@ class AppWithProviders extends StatelessWidget {
                   authRepository: ctx.read<AuthRepository>(),
                   userRepository: ctx.read<UserRepository>())),
           BlocProvider(
-              create: (ctx) => ChatroomBloc(chatroomRepository: ctx.read<ChatroomRepository>())),
-          BlocProvider(create: (ctx) => ContactBloc(userRepository: ctx.read<UserRepository>()))
+              create: (ctx) => ChatroomListBloc(chatroomRepository: ctx.read<ChatroomRepository>())),
+          BlocProvider(create: (ctx) => ContactListBloc(userRepository: ctx.read<UserRepository>()))
         ], child: MyApp()));
   }
 }

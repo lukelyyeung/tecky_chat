@@ -1,4 +1,4 @@
-part of 'chatroom_bloc.dart';
+part of 'chatroom_list_bloc.dart';
 
 enum ChatroomListStatus {
   loading,
@@ -7,17 +7,17 @@ enum ChatroomListStatus {
   loaded,
 }
 
-class ChatroomState {
+class ChatroomListState {
   final List<Chatroom> chatrooms;
   final ChatroomListStatus chatroomListStatus;
 
   bool get isLoading => chatroomListStatus == ChatroomListStatus.loading;
 
-  ChatroomState._(
+  ChatroomListState._(
       {this.chatrooms = const [], this.chatroomListStatus = ChatroomListStatus.notLoaded});
-  ChatroomState.initial() : this._();
-  ChatroomState.loading() : this._(chatroomListStatus: ChatroomListStatus.loading);
-  ChatroomState.loaded(List<Chatroom> chatrooms)
+  ChatroomListState.initial() : this._();
+  ChatroomListState.loading() : this._(chatroomListStatus: ChatroomListStatus.loading);
+  ChatroomListState.loaded(List<Chatroom> chatrooms)
       : this._(
           chatroomListStatus: ChatroomListStatus.loaded,
           chatrooms: chatrooms,

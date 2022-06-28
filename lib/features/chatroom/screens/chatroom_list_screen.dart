@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tecky_chat/features/chatroom/blocs/chatroom_bloc.dart';
+import 'package:tecky_chat/features/chatroom/blocs/chatroom_list_bloc.dart';
 import 'package:tecky_chat/features/common/widgets/user_item.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
@@ -26,7 +26,7 @@ class _ChatroomListScreenState extends State<ChatroomListScreen> {
         color: ThemeColors.neutralWhite,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: BlocBuilder<ChatroomBloc, ChatroomState>(builder: (context, state) {
+          child: BlocBuilder<ChatroomListBloc, ChatroomListState>(builder: (context, state) {
             if (state.isLoading) {
               return const Center(child: CupertinoActivityIndicator());
             }

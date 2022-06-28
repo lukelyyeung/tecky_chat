@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tecky_chat/features/common/widgets/user_item.dart';
-import 'package:tecky_chat/features/contacts/blocs/contact_bloc.dart';
+import 'package:tecky_chat/features/contacts/blocs/contact_list_bloc.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
 class ContactScreen extends StatefulWidget {
@@ -18,7 +18,7 @@ class _ContactScreenState extends State<ContactScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<ContactBloc>().add(ContactRetrieve());
+    context.read<ContactListBloc>().add(ContactRetrieve());
   }
 
   @override
@@ -28,7 +28,7 @@ class _ContactScreenState extends State<ContactScreen> {
         color: ThemeColors.neutralWhite,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: BlocBuilder<ContactBloc, ContactState>(builder: (context, state) {
+          child: BlocBuilder<ContactListBloc, ContactListState>(builder: (context, state) {
             if (state.isLoading) {
               return const Center(child: CupertinoActivityIndicator());
             }

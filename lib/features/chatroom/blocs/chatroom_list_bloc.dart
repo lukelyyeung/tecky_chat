@@ -4,14 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tecky_chat/features/chatroom/models/chatroom.dart';
 import 'package:tecky_chat/features/chatroom/respositories/chatroom_repository.dart';
 
-part 'chatroom_event.dart';
-part 'chatroom_state.dart';
+part 'chatroom_list_event.dart';
+part 'chatroom_list_state.dart';
 
-class ChatroomBloc extends Bloc<ChatroomListChange, ChatroomState> {
+class ChatroomListBloc extends Bloc<ChatroomListChange, ChatroomListState> {
   final ChatroomRepository chatroomRepository;
   late final StreamSubscription<List<Chatroom>> _contactListSubscription;
 
-  ChatroomBloc({required this.chatroomRepository}) : super(ChatroomState.initial()) {
+  ChatroomListBloc({required this.chatroomRepository}) : super(ChatroomListState.initial()) {
     on<ChatroomListChange>(_onChatroomListChange);
 
     _listenToChatroomList();
@@ -30,6 +30,6 @@ class ChatroomBloc extends Bloc<ChatroomListChange, ChatroomState> {
   }
 
   void _onChatroomListChange(ChatroomListChange event, Emitter emit) {
-    emit(ChatroomState.loaded(event.chatrooms));
+    emit(ChatroomListState.loaded(event.chatrooms));
   }
 }
