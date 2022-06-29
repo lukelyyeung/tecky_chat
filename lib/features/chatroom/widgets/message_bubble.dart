@@ -9,13 +9,13 @@ enum MessageBubbleDirection {
 class MessageBubble extends StatelessWidget {
   final Widget child;
   final MessageBubbleDirection direction;
-  final String footer;
+  final Widget? footer;
 
   const MessageBubble({
     Key? key,
     required this.child,
     this.direction = MessageBubbleDirection.outgoing,
-    this.footer = '',
+    this.footer,
   }) : super(key: key);
 
   @override
@@ -41,11 +41,15 @@ class MessageBubble extends StatelessWidget {
           children: [
             child,
             const SizedBox(height: 8),
-            Text(
-              footer,
-              style: TextStyle(
-                  color: isIncoming ? ThemeColors.neutralActive : ThemeColors.neutralWhite,
-                  fontSize: 10),
+            IconTheme(
+              data: IconThemeData(
+                  color: isIncoming ? ThemeColors.neutralActive : ThemeColors.neutralWhite),
+              child: DefaultTextStyle(
+                child: footer ?? const SizedBox.shrink(),
+                style: TextStyle(
+                    color: isIncoming ? ThemeColors.neutralActive : ThemeColors.neutralWhite,
+                    fontSize: 10),
+              ),
             ),
           ],
         ));

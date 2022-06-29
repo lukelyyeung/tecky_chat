@@ -7,7 +7,7 @@ import 'package:tecky_chat/features/common/repositories/user_respository.dart';
 
 class _ChatroomCollectionPaths {
   static const chatrooms = 'chatrooms';
-  static getChatoomPath(String chatroomId) => 'chatrooms/$chatroomId';
+  static getMessageCollectionPath(String chatroomId) => 'chatrooms/$chatroomId/messages';
 }
 
 class ChatroomRepository {
@@ -78,6 +78,14 @@ class ChatroomRepository {
     });
   }
 
+  Stream<List<Message>> getMessageListStream(String chatroomId) {
+    return firebaseFirestore
+        .collection(_ChatroomCollectionPaths.getMessageCollectionPath(chatroomId))
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => Message.fromJSON(doc.toJSON())).toList());
+  }
+
   Future<String> createChatroom(String opponentId) async {
     final existingRoom = await firebaseFirestore
         .collection(_ChatroomCollectionPaths.chatrooms)
@@ -102,5 +110,11 @@ class ChatroomRepository {
 
   // Stream<List<Message>> getMessageStreamByChatroomId(String chatroomId) {}
 
-  Future<void> sendMessage(Message message) async {}
+  Future<String> sendMessage(String chatroomId, Message message) async {
+    final doc = await firebaseFirestore
+        .collection(_ChatroomCollectionPaths.getMessageCollectionPath(chatroomId))
+        .add(message.toJSON());
+
+    return doc.id;
+  }
 }
