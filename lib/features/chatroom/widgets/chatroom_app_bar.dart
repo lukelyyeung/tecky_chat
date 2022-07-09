@@ -46,9 +46,12 @@ class ChatroomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: Icon(Icons.chevron_left, color: ThemeColors.neutralActive),
           ),
         ),
-        Text(
-          title,
-          style: const TextStyle(color: ThemeColors.neutralActive),
+        Flexible(
+          child: Text(
+            title,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: ThemeColors.neutralActive),
+          ),
         )
       ]),
     );

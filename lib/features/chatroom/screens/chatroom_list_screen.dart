@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tecky_chat/features/auth/blocs/auth_bloc.dart';
+import 'package:tecky_chat/features/auth/blocs/auth_state.dart';
 import 'package:tecky_chat/features/chatroom/blocs/chatroom_list_bloc.dart';
 import 'package:tecky_chat/features/common/widgets/user_item.dart';
 import 'package:tecky_chat/theme/colors.dart';
@@ -31,16 +33,23 @@ class _ChatroomListScreenState extends State<ChatroomListScreen> {
               return const Center(child: CupertinoActivityIndicator());
             }
 
-            return ListView(
-              children: [
-                for (var chatroom in state.chatrooms)
-                  UserItem(
-                      onTap: () => context.push('/chats/${chatroom.id}'),
-                      onlineStatus: UserOnlineStatus.online,
-                      displayName: chatroom.displayName,
-                      subtitle: 'Last online: a few moment ago',
-                      imageSrc: "https://picsum.photos/seed/${chatroom.id}/200/200")
-              ],
+            return BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, authState) {
+                return ListView(
+                  children: [
+                    for (var chatroom in state.chatrooms)
+                      UserItem(
+                          onTap: () => context.push('/chats/${chatroom.id}'),
+                          onlineStatus: UserOnlineStatus.online,
+                          displayName: chatroom.displayName,
+                          unreadCount: chatroom.unread[authState.user!.id],
+                          subtitle: chatroom.latestMessage != null
+                              ? '${chatroom.latestMessage!.displayName}: ${chatroom.latestMessage!.textContent ?? ''}'
+                              : '',
+                          imageSrc: "https://picsum.photos/seed/${chatroom.id}/200/200")
+                  ],
+                );
+              },
             );
           }),
         ),

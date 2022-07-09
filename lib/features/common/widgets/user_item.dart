@@ -83,7 +83,7 @@ class UserItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.baseline,
             children: [
-              Text(displayName),
+              Flexible(child: Text(displayName, overflow: TextOverflow.ellipsis,)),
               if (timeString != null)
                 Text(
                   timeString!,

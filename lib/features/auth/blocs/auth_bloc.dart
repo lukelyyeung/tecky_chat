@@ -48,7 +48,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       final currentUser = User(
           id: firebaseUser.uid,
-          displayName: firebaseUser.displayName ?? firebaseUser.email ?? '',
+          displayName: firebaseUser.displayName?.isNotEmpty != true
+              ? (firebaseUser.email ?? '')
+              : firebaseUser.displayName!,
           profileUrl: firebaseUser.photoURL);
 
       userRepository.createUser(currentUser);
