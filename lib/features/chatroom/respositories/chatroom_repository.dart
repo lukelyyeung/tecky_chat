@@ -3,11 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:tecky_chat/extensions/extended_document_snasphot.dart';
 import 'package:tecky_chat/features/chatroom/models/chatroom.dart';
 import 'package:tecky_chat/features/chatroom/models/message.dart';
+import 'package:tecky_chat/features/common/models/user.dart';
 import 'package:tecky_chat/features/common/repositories/user_respository.dart';
 
 class _ChatroomCollectionPaths {
   static const chatrooms = 'chatrooms';
   static getChatoomPath(String chatroomId) => 'chatrooms/$chatroomId';
+  static getMessagePath(String chatroomId) => 'chatrooms/$chatroomId/messages';
 }
 
 class ChatroomRepository {
@@ -30,7 +32,9 @@ class ChatroomRepository {
           }
 
           final userIds = snapshot.docs.map((doc) => doc.data()['participants']).toList();
-          final flattenedUserIds = [for (var batch in userIds) ...batch].cast<String>();
+          final flattenedUserIds = {
+            ...[for (var batch in userIds) ...batch].cast<String>()
+          }.toList();
 
           final users = await userRepository.getUsersByIds(flattenedUserIds);
 
@@ -43,7 +47,7 @@ class ChatroomRepository {
               final opponentId = chatroom.participants
                   .firstWhere((userId) => userId != firebaseAuth.currentUser?.uid);
 
-              final opponent = userMap[opponentId]!;
+              final opponent = userMap[opponentId] ?? User.empty;
               chatroom = chatroom.copyWith(
                   displayName: opponent.displayName, iconUrl: opponent.profileUrl);
             }
@@ -69,13 +73,21 @@ class ChatroomRepository {
         final opponentId =
             chatroom.participants.firstWhere((userId) => userId != firebaseAuth.currentUser?.uid);
 
-        final opponent = userMap[opponentId]!;
+        final opponent = userMap[opponentId] ?? User.empty;
         chatroom =
             chatroom.copyWith(displayName: opponent.displayName, iconUrl: opponent.profileUrl);
       }
 
       return chatroom;
     });
+  }
+
+  Stream<List<Message>> getMessageStream(String chatroomId) {
+    return firebaseFirestore
+        .collection(_ChatroomCollectionPaths.getMessagePath(chatroomId))
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => Message.fromJSON(doc.toJSON())).toList());
   }
 
   Future<String> createChatroom(String opponentId) async {
@@ -100,7 +112,11 @@ class ChatroomRepository {
 
   Future<void> createGroup() async {}
 
-  // Stream<List<Message>> getMessageStreamByChatroomId(String chatroomId) {}
-
-  Future<void> sendMessage(Message message) async {}
+  Future<String> sendMessage(String chatroomId, Message message) async {
+    final doc = await firebaseFirestore
+        .collection(_ChatroomCollectionPaths.getMessagePath(chatroomId))
+        .add(message.toJSON());
+    
+    return doc.id;
+  }
 }

@@ -26,10 +26,11 @@ class Chatroom {
 
   static const empty = Chatroom(id: '', displayName: '');
 
-  static Map<String, dynamic> createChatroomPayload({required String userId, required String opponentId}) {
+  static Map<String, dynamic> createChatroomPayload(
+      {required String userId, required String opponentId}) {
     return {
-      "participant.$opponentId": true,
-      "participant.$userId": true,
+      "isGroup": false,
+      "participant": {userId: true, opponentId: true},
       "participants": [opponentId, userId],
       "createdAt": FieldValue.serverTimestamp(),
       "modifiedAt": FieldValue.serverTimestamp(),

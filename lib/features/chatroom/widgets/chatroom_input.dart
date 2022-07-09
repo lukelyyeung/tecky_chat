@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tecky_chat/features/chatroom/models/message.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
 class ChatroomInput extends StatefulWidget {
-  final void Function(Message message) onMessageSend;
+  final void Function(String textContent) onMessageSend;
   const ChatroomInput({Key? key, required this.onMessageSend}) : super(key: key);
 
   @override
@@ -19,7 +18,7 @@ class _ChatroomInputState extends State<ChatroomInput> {
       return;
     }
 
-    widget.onMessageSend(Message(authorId: 'fake-my-id', textContent: message));
+    widget.onMessageSend(message);
     _formKey.currentState?.reset();
     FocusManager.instance.primaryFocus?.unfocus();
   }

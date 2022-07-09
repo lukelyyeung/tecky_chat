@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tecky_chat/features/auth/repositories/auth_repository.dart';
 import 'package:tecky_chat/features/chatroom/blocs/chatroom_bloc.dart';
+import 'package:tecky_chat/features/chatroom/blocs/message_bloc.dart';
 import 'package:tecky_chat/features/chatroom/models/message.dart';
 import 'package:tecky_chat/features/chatroom/respositories/chatroom_repository.dart';
 import 'package:tecky_chat/features/chatroom/widgets/chatroom_app_bar.dart';
@@ -13,9 +17,19 @@ class ChatroomScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ChatroomBloc(
-          chatroomId: chatroomId, chatroomRepository: context.read<ChatroomRepository>()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ChatroomBloc(
+              authRepository: context.read<AuthRepository>(),
+              chatroomId: chatroomId,
+              chatroomRepository: context.read<ChatroomRepository>()),
+        ),
+        BlocProvider(
+          create: (context) => MessageBloc(
+              chatroomId: chatroomId, chatroomRepository: context.read<ChatroomRepository>()),
+        ),
+      ],
       child: const _ChatroomScreen(),
     );
   }
@@ -29,18 +43,16 @@ class _ChatroomScreen extends StatefulWidget {
 }
 
 class _ChatroomScreenState extends State<_ChatroomScreen> {
-  final _messages = [
-    Message(textContent: 'Hello World', authorId: 'fake-my-id'),
-    Message(textContent: 'Is this your 1st Flutter Application?', authorId: 'not-my-id'),
-    Message(textContent: 'Yes. Flutter is really simple and fast.', authorId: 'not-my-id'),
-    Message(textContent: '---', authorId: 'system'),
-    Message(textContent: 'Also, its built-in UI component is so nice.', authorId: 'fake-my-id'),
-  ];
+  final scrollController = ScrollController();
 
-  void _onMessageSend(Message message) {
-    setState(() {
-      _messages.add(message);
-    });
+  void _onMessageSend(String textContent) {
+    final completer = Completer<String>()
+      ..future.then((_) {
+        scrollController.animateTo(0,
+            duration: const Duration(milliseconds: 400), curve: Curves.easeInOutExpo);
+      });
+
+    context.read<ChatroomBloc>().add(ChatroomSendTextMessage(textContent, completer: completer));
   }
 
   @override
@@ -55,7 +67,11 @@ class _ChatroomScreenState extends State<_ChatroomScreen> {
         ),
       ),
       body: Column(children: [
-        Expanded(child: MessageList(messages: _messages)),
+        Expanded(child: BlocBuilder<MessageBloc, MessageState>(
+          builder: (context, state) {
+            return MessageList(scrollController: scrollController, messages: state.messages);
+          },
+        )),
         ChatroomInput(
           onMessageSend: _onMessageSend,
         ),

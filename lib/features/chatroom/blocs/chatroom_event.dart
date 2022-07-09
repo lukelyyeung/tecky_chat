@@ -8,3 +8,10 @@ class ChatroomUpdated extends ChatroomEvent {
 
   ChatroomUpdated(this.chatroom);
 }
+
+class ChatroomSendTextMessage extends ChatroomEvent {
+  final String textContent;
+  final Completer<String>? completer;
+
+  ChatroomSendTextMessage(this.textContent, {this.completer});
+}
