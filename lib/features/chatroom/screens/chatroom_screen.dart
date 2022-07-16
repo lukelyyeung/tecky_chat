@@ -1,15 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tecky_chat/features/auth/repositories/auth_repository.dart';
 import 'package:tecky_chat/features/chatroom/blocs/chatroom_bloc.dart';
 import 'package:tecky_chat/features/chatroom/blocs/message_bloc.dart';
-import 'package:tecky_chat/features/chatroom/models/message.dart';
 import 'package:tecky_chat/features/chatroom/respositories/chatroom_repository.dart';
 import 'package:tecky_chat/features/chatroom/widgets/chatroom_app_bar.dart';
 import 'package:tecky_chat/features/chatroom/widgets/chatroom_input.dart';
 import 'package:tecky_chat/features/chatroom/widgets/message_list.dart';
+import 'package:tecky_chat/features/file/repositories/file_repository.dart';
 
 class ChatroomScreen extends StatelessWidget {
   final String chatroomId;
@@ -21,6 +22,7 @@ class ChatroomScreen extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) => ChatroomBloc(
+              fileRepository: context.read<FileRepository>(),
               authRepository: context.read<AuthRepository>(),
               chatroomId: chatroomId,
               chatroomRepository: context.read<ChatroomRepository>()),
@@ -55,6 +57,16 @@ class _ChatroomScreenState extends State<_ChatroomScreen> {
     context.read<ChatroomBloc>().add(ChatroomSendTextMessage(textContent, completer: completer));
   }
 
+  void _onFileSend(List<File> files) {
+    final completer = Completer<String>()
+      ..future.then((_) {
+        scrollController.animateTo(0,
+            duration: const Duration(milliseconds: 400), curve: Curves.easeInOutExpo);
+      });
+
+    context.read<ChatroomBloc>().add(ChatroomSendImageMessage(files, completer: completer));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,6 +85,7 @@ class _ChatroomScreenState extends State<_ChatroomScreen> {
           },
         )),
         ChatroomInput(
+          onFileSend: _onFileSend,
           onMessageSend: _onMessageSend,
         ),
       ]),

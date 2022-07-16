@@ -5,6 +5,7 @@ enum MessageStatus {
   sending,
   delivered,
   read,
+  error,
 }
 
 enum MessageType {
@@ -38,6 +39,13 @@ class Message {
       : id = '',
         type = MessageType.text,
         mediaFiles = [],
+        status = MessageStatus.sending,
+        createdAt = null,
+        modifiedAt = null;
+
+  Message.fromImages(this.authorId, {required this.mediaFiles, this.textContent = ''})
+      : id = '',
+        type = MessageType.image,
         status = MessageStatus.sending,
         createdAt = null,
         modifiedAt = null;

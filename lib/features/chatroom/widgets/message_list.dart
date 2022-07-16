@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tecky_chat/features/auth/blocs/auth_bloc.dart';
@@ -35,14 +37,56 @@ class MessageList extends StatelessWidget {
                   }
 
                   final isIncoming = message.authorId != state.user?.id;
+                  final footer =
+                      '${DateFormat('HH:mm').format(message.createdAt ?? DateTime.now())}・Sent';
+                  final direction = isIncoming
+                      ? MessageBubbleDirection.incoming
+                      : MessageBubbleDirection.outgoing;
+
+                  if (message.type == MessageType.image) {
+                    final isUploading = message.mediaFiles.isEmpty;
+                    final isError = message.status == MessageStatus.error;
+
+                    if (message.authorId != state.user!.id && (isUploading || isError)) {
+                      return MapEntry(index, const SizedBox.shrink());
+                    }
+
+                    final widget = Container(
+                        alignment: isIncoming ? Alignment.centerLeft : Alignment.centerRight,
+                        child: MessageBubble(
+                          footer: footer,
+                          direction: direction,
+                          child: AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: CachedNetworkImage(
+                                fit: BoxFit.cover,
+                                placeholder: (_, __) {
+                                  return Container(
+                                      color: ThemeColors.neutralSecondary,
+                                      child: const CupertinoActivityIndicator());
+                                },
+                                errorWidget: (_, __, ___) {
+                                  return Container(
+                                      color: ThemeColors.neutralSecondary,
+                                      child: isUploading
+                                          ? const CupertinoActivityIndicator()
+                                          : const Icon(
+                                              Icons.error,
+                                              color: ThemeColors.neutralWhite,
+                                            ));
+                                },
+                                imageUrl: isUploading ? '' : message.mediaFiles.first),
+                          ),
+                        ));
+
+                    return MapEntry(index, widget);
+                  }
+
                   final widget = Container(
                       alignment: isIncoming ? Alignment.centerLeft : Alignment.centerRight,
                       child: MessageBubble(
-                        footer:
-                            '${DateFormat('HH:mm').format(message.createdAt ?? DateTime.now())}・Sent',
-                        direction: isIncoming
-                            ? MessageBubbleDirection.incoming
-                            : MessageBubbleDirection.outgoing,
+                        footer: footer,
+                        direction: direction,
                         child: TextMessage(
                           textContent: message.textContent,
                           textColor:

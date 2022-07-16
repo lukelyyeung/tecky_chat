@@ -15,3 +15,11 @@ class ChatroomSendTextMessage extends ChatroomEvent {
 
   ChatroomSendTextMessage(this.textContent, {this.completer});
 }
+
+class ChatroomSendImageMessage extends ChatroomEvent {
+  final List<File> images;
+  final String? textContent;
+  final Completer<String>? completer;
+
+  ChatroomSendImageMessage(this.images, {this.completer, this.textContent});
+}

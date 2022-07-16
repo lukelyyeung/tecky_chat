@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
 class ChatroomInput extends StatefulWidget {
   final void Function(String textContent) onMessageSend;
-  const ChatroomInput({Key? key, required this.onMessageSend}) : super(key: key);
+  final void Function(List<File> files) onFileSend;
+  const ChatroomInput({Key? key, required this.onMessageSend, required this.onFileSend})
+      : super(key: key);
 
   @override
   State<ChatroomInput> createState() => _ChatroomInputState();
@@ -35,7 +40,20 @@ class _ChatroomInputState extends State<ChatroomInput> {
           child: SafeArea(
             bottom: true,
             child: Row(children: [
-              const SizedBox(width: 48, child: Icon(Icons.add)),
+              GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () async {
+                    final imagePicker = ImagePicker();
+
+                    final files = await imagePicker.pickMultiImage();
+
+                    if (files == null) {
+                      return;
+                    }
+
+                    widget.onFileSend(files.map((file) => File(file.path)).toList());
+                  },
+                  child: const SizedBox(width: 48, child: Icon(Icons.add))),
               Expanded(
                   child: TextFormField(
                 validator: (value) {

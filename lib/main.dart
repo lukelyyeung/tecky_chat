@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +18,7 @@ import 'package:tecky_chat/features/common/repositories/user_respository.dart';
 import 'package:tecky_chat/features/common/screens/main_tab_screen.dart';
 import 'package:tecky_chat/features/common/screens/splash_screen.dart';
 import 'package:tecky_chat/features/contacts/blocs/contact_list_bloc.dart';
+import 'package:tecky_chat/features/file/repositories/file_repository.dart';
 import 'package:tecky_chat/features/notification/blocs/notification_bloc.dart';
 import 'package:tecky_chat/firebase_options.dart';
 import 'package:tecky_chat/theme/colors.dart';
@@ -54,6 +56,7 @@ class AppWithProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     final firebaseAuth = FirebaseAuth.instance;
     final firebaseFirestore = FirebaseFirestore.instance;
+    final firebaseStorage = FirebaseStorage.instance;
 
     return MultiRepositoryProvider(
         providers: [
@@ -66,6 +69,7 @@ class AppWithProviders extends StatelessWidget {
                   firebaseAuth: firebaseAuth,
                   firebaseFirestore: firebaseFirestore)),
           RepositoryProvider(create: (_) => AuthRepository(firebaseAuth: firebaseAuth)),
+          RepositoryProvider(create: (_) => FileRepository(firebaseStorage: firebaseStorage)),
         ],
         child: MultiBlocProvider(providers: [
           BlocProvider(

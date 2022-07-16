@@ -116,7 +116,29 @@ class ChatroomRepository {
     final doc = await firebaseFirestore
         .collection(_ChatroomCollectionPaths.getMessagePath(chatroomId))
         .add(message.toJSON());
-    
+
     return doc.id;
+  }
+
+  Future<void> setFileMessageUploaded(String chatroomId, String messageId,
+      {required List<String> mediaFiles}) async {
+    await firebaseFirestore
+        .collection(_ChatroomCollectionPaths.getMessagePath(chatroomId))
+        .doc(messageId)
+        .update({
+      'mediaFiles': mediaFiles,
+    });
+  }
+
+  Future<void> setFileMessageUploadFailed(
+    String chatroomId,
+    String messageId,
+  ) async {
+    await firebaseFirestore
+        .collection(_ChatroomCollectionPaths.getMessagePath(chatroomId))
+        .doc(messageId)
+        .update({
+      'status': MessageStatus.error.toString().split('.').last,
+    });
   }
 }
