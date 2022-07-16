@@ -5,6 +5,7 @@ import 'package:tecky_chat/features/common/models/user.dart';
 class _UserCollectionPaths {
   static const users = 'users';
   static getUserPath(String uid) => 'users/$uid';
+  static const notificationSettings = 'notificationSettings';
 }
 
 class UserRepository {
@@ -38,4 +39,19 @@ class UserRepository {
   }
 
   Future<void> updateUser(User currentUser) async {}
+
+  Future<void> upsertNotificationSetting(String token) async {
+    await firebaseFirestore.collection(_UserCollectionPaths.notificationSettings).doc(token).set({
+      'token': token,
+      'userId': firebaseAuth.currentUser!.uid,
+      'modifiedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> removeNotificationSetting(String token) async {
+    await firebaseFirestore
+        .collection(_UserCollectionPaths.notificationSettings)
+        .doc(token)
+        .delete();
+  }
 }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tecky_chat/features/chatroom/screens/chatroom_list_screen.dart';
 import 'package:tecky_chat/features/common/widgets/custom_bottom_navigation_bar.dart';
 import 'package:tecky_chat/features/contacts/screens/contact_screen.dart';
+import 'package:tecky_chat/features/notification/widgets/message_open_app_handler.dart';
 import 'package:tecky_chat/features/settings/screens/setting_screen.dart';
 import 'package:tecky_chat/theme/colors.dart';
 
@@ -47,32 +48,34 @@ class _MainTabScreenState extends State<MainTabScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: TabBarView(controller: _tabController, children: const [
-        ContactScreen(),
-        ChatroomListScreen(),
-        SettingScreen(),
-      ]),
-      bottomNavigationBar: AnimatedBuilder(
-          animation: _tabController,
-          builder: (context, snapshot) {
-            return CustomBottomNavigationBar(
-              onTap: (index) => context.go('/main?tab=${MainTabScreen.tabs[index]}'),
-              currentIndex: _tabController.index,
-              items: _bottomNavigationBarItem,
-            );
-          }),
-      backgroundColor: ThemeColors.neutralSecondary,
-      appBar: AppBar(
-          elevation: 0,
-          backgroundColor: ThemeColors.neutralWhite,
-          centerTitle: false,
-          title: AnimatedBuilder(
-              animation: _tabController,
-              builder: (context, _) {
-                final title = MainTabScreen.tabs[_tabController.index].toUpperCase();
-                return Text(title, style: const TextStyle(color: ThemeColors.neutralActive));
-              })),
+    return MessageOpenAppHandler(
+      child: Scaffold(
+        body: TabBarView(controller: _tabController, children: const [
+          ContactScreen(),
+          ChatroomListScreen(),
+          SettingScreen(),
+        ]),
+        bottomNavigationBar: AnimatedBuilder(
+            animation: _tabController,
+            builder: (context, snapshot) {
+              return CustomBottomNavigationBar(
+                onTap: (index) => context.go('/main?tab=${MainTabScreen.tabs[index]}'),
+                currentIndex: _tabController.index,
+                items: _bottomNavigationBarItem,
+              );
+            }),
+        backgroundColor: ThemeColors.neutralSecondary,
+        appBar: AppBar(
+            elevation: 0,
+            backgroundColor: ThemeColors.neutralWhite,
+            centerTitle: false,
+            title: AnimatedBuilder(
+                animation: _tabController,
+                builder: (context, _) {
+                  final title = MainTabScreen.tabs[_tabController.index].toUpperCase();
+                  return Text(title, style: const TextStyle(color: ThemeColors.neutralActive));
+                })),
+      ),
     );
   }
 }

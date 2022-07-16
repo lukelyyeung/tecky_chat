@@ -97,7 +97,7 @@ class UserItem extends StatelessWidget {
               textBaseline: TextBaseline.ideographic,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(subtitle),
+                Flexible(child: Text(subtitle, overflow: TextOverflow.ellipsis,)),
                 if (unreadCount != null)
                   Container(
                     alignment: Alignment.center,

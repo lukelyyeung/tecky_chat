@@ -29,3 +29,9 @@ export interface User {
   displayName: string;
   profileUrl?: string;
 }
+
+export interface NotificationSetting {
+  token: string;
+  userId: string;
+  modifiedAt: FirebaseFirestore.Timestamp;
+}
